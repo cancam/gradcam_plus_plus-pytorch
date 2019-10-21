@@ -5,6 +5,7 @@ import pdb
 
 def main(annotations):
     coco_ds = CocoDataset(annotations)
+    coco_ds.preprocess_images()
     pdb.set_trace()
 
 if __name__ == '__main__':

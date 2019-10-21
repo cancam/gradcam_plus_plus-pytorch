@@ -1,5 +1,6 @@
 import numpy as np
 from pycocotools.coco import COCO
+import pdb
 
 class CocoDataset():
 
@@ -20,6 +21,16 @@ class CocoDataset():
     def __init__(self, ann_file):
         self.img_infos = self.load_annotations(ann_file)
     
+    def preprocess_images(self):
+        # filter images
+        valid_inds = self._filter_imgs()
+        self.img_infos = [self.img_infos[i] for i in valid_inds]
+        # load images and metas.
+        for idx in range(0, len(self.img_infos)):
+            img_info = self.img_infos[idx]
+            ann_info = self.get_ann_info(idx)
+            
+            pdb.set_trace()
     def load_annotations(self, ann_file):
         self.coco = COCO(ann_file)
         self.cat_ids = self.coco.getCatIds()
