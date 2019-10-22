@@ -1,6 +1,11 @@
 import numpy as np
 from pycocotools.coco import COCO
+from PIL import Image
+from PIL import ImageOps
+
+import os
 import pdb
+
 
 class CocoDataset():
 
@@ -18,19 +23,46 @@ class CocoDataset():
                'mouse', 'remote', 'keyboard', 'cell_phone', 'microwave',
                'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock',
                'vase', 'scissors', 'teddy_bear', 'hair_drier', 'toothbrush')
-    def __init__(self, ann_file):
+    def __init__(self, PATH, set_name):
+        self.path = PATH
+        self.set_name = set_name
+
+        ann_filename = 'annotations/instances_' + set_name + '.json'
+        ann_file = os.path.join(PATH, ann_filename)
+        
         self.img_infos = self.load_annotations(ann_file)
     
+    def convert_boxes(self, box, img_size):
+        area = (box[0], img_size[1]-box[1], box[2], box[3])
+        return area
+
+    def seperate_parts(self, img, bboxes, labels):
+        parts = []
+        for box in bboxes:
+            area = self.convert_boxes(box, img.size)
+            part = ImageOps.crop(img, area) 
+            pdb.set_trace()
+
+    def read_image(self, path):
+        return Image.open(path)
+
     def preprocess_images(self):
         # filter images
         valid_inds = self._filter_imgs()
         self.img_infos = [self.img_infos[i] for i in valid_inds]
         # load images and metas.
         for idx in range(0, len(self.img_infos)):
+            # read img info, annotations.
             img_info = self.img_infos[idx]
             ann_info = self.get_ann_info(idx)
-            
-            pdb.set_trace()
+            # get bboxes and labels
+            bboxes = ann_info['bboxes']
+            labels = ann_info['labels']
+            # read image
+            img = self.read_image(os.path.join(self.path, self.set_name, img_info['filename']))
+            # pass to crop function
+            self.seperate_parts(img, bboxes, labels)
+
     def load_annotations(self, ann_file):
         self.coco = COCO(ann_file)
         self.cat_ids = self.coco.getCatIds()
