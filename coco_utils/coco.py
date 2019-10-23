@@ -51,12 +51,13 @@ class CocoDataset():
         measure = box[2] * box[3]
         return area, measure
 
-    def seperate_parts(self, img, bboxes, labels, debug=False):
+    def seperate_parts(self, img, bboxes, labels, debug=True):
         partwlabel = []
         for idx, box in enumerate(bboxes):
             area, measure = self.convert_boxes(box)
             part = img.crop(area)
             if debug:
+                pdb.set_trace()
                 part_.show()
                 print(self.CLASSES[labels[idx]-1])
             partwlabel.append([part, labels[idx], measure])
@@ -79,10 +80,11 @@ class CocoDataset():
             bboxes = ann_info['bboxes']
             labels = ann_info['labels']
             # read image
+            pdb.set_trace()
             img = self.read_image(os.path.join(self.path, self.set_name, img_info['filename']))
                        
             # pass to crop function
-            part_tuples = self.seperate_parts(img, bboxes, labels, debug=False)
+            part_tuples = self.seperate_parts(img, bboxes, labels, debug=True)
             scales = [element[2]/(img_info['height'] * img_info['width']) for element in part_tuples]
             self.part_info.append([len(part_tuples), scales])
             if idx % 100 == 0:
@@ -125,6 +127,7 @@ class CocoDataset():
         img_id = self.img_infos[idx]['id']
         ann_ids = self.coco.getAnnIds(imgIds=[img_id])
         ann_info = self.coco.loadAnns(ann_ids)
+        pdb.set_trace()
         return self._parse_ann_info(self.img_infos[idx], ann_info)
 
     def _filter_imgs(self, min_size=32):
