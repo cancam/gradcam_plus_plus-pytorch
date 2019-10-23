@@ -24,32 +24,52 @@ class CocoDataset():
                'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock',
                'vase', 'scissors', 'teddy_bear', 'hair_drier', 'toothbrush')
     def __init__(self, PATH, set_name):
+        
+        # create folders
         self.path = PATH
+        self.part_info = []
+        self.size = 224, 224
         self.set_name = set_name
-
+        self.processed_path = os.path.join(PATH, 'fine_tune', self.set_name[:-4])
+        self.create_folders(self.processed_path)
+        
+        # get ann file.
         ann_filename = 'annotations/instances_' + set_name + '.json'
         ann_file = os.path.join(PATH, ann_filename)
-        
         self.img_infos = self.load_annotations(ann_file)
-    
-    def convert_boxes(self, box, img_size):
-        area = (box[0], img_size[1]-box[1], box[2], box[3])
-        return area
+        
+    def create_folders(self,path):
+        # create folders if not exist
+        for idx, cname in enumerate(self.CLASSES):
+            class_folder = os.path.join(path, cname)
+            if not os.path.exists(class_folder):
+                os.makedirs(class_folder)
+        return
 
-    def seperate_parts(self, img, bboxes, labels):
-        parts = []
-        for box in bboxes:
-            area = self.convert_boxes(box, img.size)
-            part = ImageOps.crop(img, area) 
-            pdb.set_trace()
+    def convert_boxes(self, box):
+        area = (box[0], box[1], box[2], box[3])
+        measure = box[2] * box[3]
+        return area, measure
+
+    def seperate_parts(self, img, bboxes, labels, debug=False):
+        partwlabel = []
+        for idx, box in enumerate(bboxes):
+            area, measure = self.convert_boxes(box)
+            part = img.crop(area)
+            if debug:
+                part_.show()
+                print(self.CLASSES[labels[idx]-1])
+            partwlabel.append([part, labels[idx], measure])
+        return partwlabel
 
     def read_image(self, path):
         return Image.open(path)
 
-    def preprocess_images(self):
+    def process_images(self, save=False):
         # filter images
         valid_inds = self._filter_imgs()
         self.img_infos = [self.img_infos[i] for i in valid_inds]
+        imgs_w_parts = []
         # load images and metas.
         for idx in range(0, len(self.img_infos)):
             # read img info, annotations.
@@ -60,9 +80,31 @@ class CocoDataset():
             labels = ann_info['labels']
             # read image
             img = self.read_image(os.path.join(self.path, self.set_name, img_info['filename']))
+                       
             # pass to crop function
-            self.seperate_parts(img, bboxes, labels)
+            part_tuples = self.seperate_parts(img, bboxes, labels, debug=False)
+            scales = [element[2]/(img_info['height'] * img_info['width']) for element in part_tuples]
+            self.part_info.append([len(part_tuples), scales])
+            if idx % 100 == 0:
+                print("Image count:[{}]/[{}], Total Parts:{}\n".\
+                       format(idx, len(self.img_infos),len(part_tuples)))
+ 
+            
+            # collect tuples to save parts w/labels.
+            if save:
+                for tup_idx, part_tuple in enumerate(part_tuples):
+                    save_path = os.path.join(self.processed_path, self.CLASSES[part_tuple[1]-1])
+                    im_name = str(img_info['id']) + '_' + str(tup_idx) + '.jpg'
+                    save_name = os.path.join(save_path, im_name)
+                    # ignore 1d images after crop
+                    if 0 in part_tuple[0].size:
+                        continue
+                    else:
+                        part_tuple[0].save(save_name)
+            
+        return self.part_info
 
+            
     def load_annotations(self, ann_file):
         self.coco = COCO(ann_file)
         self.cat_ids = self.coco.getCatIds()
