@@ -10,7 +10,7 @@ def analysis(dataset_info):
     for element in dataset_info:
         count.append(element[0])
         scales.append(element[1])
-        pdb.set_trace()
+        #pdb.set_trace()
 
 def save_info(dataset_info, PATH, set_name):
     

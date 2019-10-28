@@ -57,7 +57,7 @@ class CocoDataset():
             area, measure = self.convert_boxes(box)
             part = img.crop(area)
             if debug:
-                pdb.set_trace()
+                #pdb.set_trace()
                 part.show()
                 print(self.CLASSES[labels[idx]-1])
             partwlabel.append([part, labels[idx], measure])
@@ -80,7 +80,7 @@ class CocoDataset():
             bboxes = ann_info['bboxes']
             labels = ann_info['labels']
             # read image
-            pdb.set_trace()
+            #pdb.set_trace()
             img = self.read_image(os.path.join(self.path, self.set_name, img_info['filename']))
                        
             # pass to crop function
@@ -127,7 +127,7 @@ class CocoDataset():
         img_id = self.img_infos[idx]['id']
         ann_ids = self.coco.getAnnIds(imgIds=[img_id])
         ann_info = self.coco.loadAnns(ann_ids)
-        pdb.set_trace()
+        #pdb.set_trace()
         return self._parse_ann_info(self.img_infos[idx], ann_info)
 
     def _filter_imgs(self, min_size=32):
