@@ -70,7 +70,7 @@ def main(PATH, set_name, extract, analysis):
     
 
 if __name__ == '__main__':
-    PATH = '/home/cancam/imgworkspace/gradcam_plus_plus-pytorch/data/coco'
+    PATH = '/home/cancam/workspace/gradcam_plus_plus-pytorch/data/coco'
     set_name = 'val2017'
     extract = True
     analysis = False

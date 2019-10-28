@@ -58,7 +58,7 @@ class CocoDataset():
             part = img.crop(area)
             if debug:
                 pdb.set_trace()
-                part_.show()
+                part.show()
                 print(self.CLASSES[labels[idx]-1])
             partwlabel.append([part, labels[idx], measure])
         return partwlabel
@@ -66,7 +66,7 @@ class CocoDataset():
     def read_image(self, path):
         return Image.open(path)
 
-    def process_images(self, save=False):
+    def process_images(self, save=True):
         # filter images
         valid_inds = self._filter_imgs()
         self.img_infos = [self.img_infos[i] for i in valid_inds]
@@ -84,7 +84,7 @@ class CocoDataset():
             img = self.read_image(os.path.join(self.path, self.set_name, img_info['filename']))
                        
             # pass to crop function
-            part_tuples = self.seperate_parts(img, bboxes, labels, debug=True)
+            part_tuples = self.seperate_parts(img, bboxes, labels, debug=False)
             scales = [element[2]/(img_info['height'] * img_info['width']) for element in part_tuples]
             self.part_info.append([len(part_tuples), scales])
             if idx % 100 == 0:
