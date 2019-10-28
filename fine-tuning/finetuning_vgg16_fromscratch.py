@@ -235,7 +235,7 @@ dataloaders_dict = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 #pdb.set_trace()
 #print(device)
-model_ft = MMDataParallel(model_ft, device_ids=range(2)).cuda()
+model_ft = MMDataParallel(model_ft, device_ids=range(4)).cuda()
 
 #model = nn.DataParallel(model_ft)
 # Send the model to GPU
@@ -261,7 +261,7 @@ else:
             print("\t",name)
 
 # Observe that all parameters are being optimized
-optimizer_ft = optim.SGD(params_to_update, lr=0.1, momentum=0.9)
+optimizer_ft = optim.SGD(params_to_update, lr=0.01, momentum=0.9)
 
 
 
