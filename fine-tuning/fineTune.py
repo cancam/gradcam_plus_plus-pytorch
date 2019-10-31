@@ -28,7 +28,7 @@ class fineTune():
 		self.input_size = input_size
 		self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 		
-		self.data_dir = os.path.join(work_dir, 'data/coco/fine-tune')
+		self.data_dir = os.path.join(work_dir, 'data/coco/fine_tune')
 		self.save_dir = os.path.join(work_dir, 'fine-tuning/models')
 		
 		self.data_transforms = {
@@ -45,7 +45,8 @@ class fineTune():
 			transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 			]),
 		}
-		
+		self.init_dataloaders(os.path.join(work_dir, self.data_dir))
+
 	def set_params(self, tune_all_params):
 		if not tune_all_params:
 			for param in self.model.parameters():
@@ -60,7 +61,7 @@ class fineTune():
 					self.params_to_update.append(param)
 					print("\t", name)
 		else:
-			for name, param in modelft.named_parameters():
+			for name, param in self.model.named_parameters():
 				if param.requires_grad == True:
 					print("\t", name) 
 		
@@ -71,7 +72,7 @@ class fineTune():
 	##set model whether pre-trained or not and set parameters of the model to
 	##train.
 		input_size = 0
-		pdb.set_trace()
+		#pdb.set_trace()
 		if self.model_name=='resnet':
 			self.model = models.resnet18(pretrained=not from_scratch)
 			self.set_params(tune_all_params)
@@ -95,18 +96,20 @@ class fineTune():
 			exit()
 
 		# send model to processing device.
-		self.model = MMDataParallel(self.model, device_ids=range(2)).cuda()
+		self.model = MMDataParallel(self.model, device_ids=range(1)).cuda()
 
 	def init_dataloaders(self, data_path):
 		dataset = {x: datasets.ImageFolder(os.path.join(data_path, x), \
 				   self.data_transforms[x]) \
 				   for x in ['train', 'val']}
-		self.dataloader = {x: torch.utils.data.DataLoader(dataset[x], \
+		self.dataloaders = {x: torch.utils.data.DataLoader(dataset[x], \
 						   batch_size = self.batch_size, \
 						   shuffle = True) \
                            for x in ['train', 'val']}
 	def train_model(self, lr=0.01, decay_factor=0.1, epochs=15, momentum = 0.9):
 		# get optimizer
+		self.init_model(tune_all_params = True, from_scratch = True)
+		self.get_params(tune_all_params = True)
 		optimizer = optim.SGD(self.params_to_update, lr, momentum)
 		criterion = nn.CrossEntropyLoss()
 		# get current time		
@@ -115,11 +118,11 @@ class fineTune():
 		best_acc = 0.0
 		
 		for epoch in range(epochs):
+			print('Epoch {}/{}'.format(epoch, epochs-1))
 			if epoch == 30 or epoch == 60:
 				for g in optimizer.param_groups:
 					g['lr'] = g['lr'] * decay_factor
-			print('Epoch {}/{}'.format(epoch, epochs-1))
-			print('LR*{}'.format(decay_factor))
+				print('LR*{}'.format(decay_factor))
 		
 			for phase in ['train', 'val']:
 				if phase == 'train':
@@ -143,8 +146,8 @@ class fineTune():
 						if phase == 'train':
 							loss.backward()
 							optimizer.step()
-					running_loss += loss.item * inputs.size(0)
-					running_corrects += torch.sum(preds = labels.data)
+					running_loss += loss.item() * inputs.size(0)
+					running_corrects += torch.sum(preds == labels.data)
 				# compute epoch stats.
 				time_elapsed = time.time()-since
 				epoch_loss = running_loss / len(dataloaders[phase].dataset)

@@ -2,15 +2,14 @@ from fineTune import fineTune
 
 if __name__ == '__main__':
     
-    test_models = True
+    test_models = False
     test_dataloaders = False
-    work_dir = '/home/cancam/imgworkspace/gradcam_plus_plus'
-
+    test_train = True 
     models = ['resnet', 'vgg', 'densenet']
     num_classes = 80
-    batch_size = 64
+    batch_size = 16
     num_epochs = 89
-    work_dir = '/home/cancam/imgworkspace/gradcam_plus_plus-pytorch'
+    work_dir = '/home/cancam/workspace/gradcam_plus_plus-pytorch'
     if test_models:
 
         for model in models:
@@ -24,3 +23,6 @@ if __name__ == '__main__':
         print(tuner.data_transforms)
         dataloader = tuner.init_dataloaders(data_path)
         print(dataloader)
+    if test_train:
+        tuner = fineTune(work_dir, models[1], num_classes, batch_size, num_epochs)
+        tuner.train_model()
