@@ -30,7 +30,7 @@ class fineTune():
 		
 		self.data_dir = os.path.join(work_dir, 'data/coco/fine_tune')
 		self.save_dir = os.path.join(work_dir, 'fine-tuning/models')
-		
+
 		self.data_transforms = {
 			'train': transforms.Compose([
 			transforms.RandomResizedCrop(input_size),
@@ -68,7 +68,7 @@ class fineTune():
 	def get_model(self):
 		print(self.model)
 
-	def init_model(self, tune_all_params = True, from_scratch = True):
+	def init_model(self, tune_all_params, from_scratch = True):
 	##set model whether pre-trained or not and set parameters of the model to
 	##train.
 		input_size = 0
@@ -97,6 +97,7 @@ class fineTune():
 
 		# send model to processing device.
 		self.model = MMDataParallel(self.model, device_ids=range(1)).cuda()
+		self.get_params(tune_all_params)
 
 	def init_dataloaders(self, data_path):
 		dataset = {x: datasets.ImageFolder(os.path.join(data_path, x), \
@@ -108,8 +109,6 @@ class fineTune():
                            for x in ['train', 'val']}
 	def train_model(self, lr=0.01, decay_factor=0.1, epochs=15, momentum = 0.9):
 		# get optimizer
-		self.init_model(tune_all_params = True, from_scratch = True)
-		self.get_params(tune_all_params = True)
 		optimizer = optim.SGD(self.params_to_update, lr, momentum)
 		criterion = nn.CrossEntropyLoss()
 		# get current time		
