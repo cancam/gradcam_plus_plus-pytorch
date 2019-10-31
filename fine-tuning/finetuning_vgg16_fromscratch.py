@@ -19,7 +19,7 @@ from mmcv.parallel import MMDataParallel
 
 # Top level data directory. Here we assume the format of the directory conforms 
 #   to the ImageFolder structure
-data_dir = "/home/cancam/workspace/gradcam_plus_plus-pytorch/data/coco/fine_tune"
+data_dir = "/home/cancam/imgworkspace/gradcam_plus_plus-pytorch/data/coco/fine-tune"
 # Models to choose from [resnet, alexnet, vgg, squeezenet, densenet, inception]
 model_name = "vgg"
 
@@ -27,14 +27,14 @@ model_name = "vgg"
 num_classes = 80
 
 # Batch size for training (change depending on how much memory you have)
-batch_size = 256
+batch_size = 64
 
 # Number of epochs to train for 
 num_epochs = 90
 
 # Flag for feature extracting. When False, we finetune the whole model, 
 #   when True we only update the reshaped layer params
-feature_extract = True
+feature_extract = False
 
 def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_inception=False):
     since = time.time()
@@ -235,7 +235,7 @@ dataloaders_dict = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 #pdb.set_trace()
 #print(device)
-model_ft = MMDataParallel(model_ft, device_ids=range(4)).cuda()
+model_ft = MMDataParallel(model_ft, device_ids=range(2)).cuda()
 
 #model = nn.DataParallel(model_ft)
 # Send the model to GPU
@@ -261,7 +261,7 @@ else:
             print("\t",name)
 
 # Observe that all parameters are being optimized
-optimizer_ft = optim.SGD(params_to_update, lr=0.01, momentum=0.9)
+optimizer_ft = optim.SGD(params_to_update, lr=0.0025, momentum=0.9)
 
 
 

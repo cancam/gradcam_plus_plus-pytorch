@@ -27,14 +27,14 @@ model_name = "densenet"
 num_classes = 80
 
 # Batch size for training (change depending on how much memory you have)
-batch_size = 512
+batch_size = 64
 
 # Number of epochs to train for 
-num_epochs = 60
+num_epochs = 90
 
 # Flag for feature extracting. When False, we finetune the whole model, 
 #   when True we only update the reshaped layer params
-feature_extract = True
+feature_extract = False
 
 def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_inception=False):
     since = time.time()
@@ -45,7 +45,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
     best_acc = 0.0
 
     for epoch in range(num_epochs):
-        if epoch==20 or epoch==40:
+        if epoch==30 or epoch==60:
             for g in optimizer.param_groups:
                 g['lr'] = g['lr']*0.1
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
@@ -201,7 +201,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     return model_ft, input_size
 
 # Initialize the model for this run
-model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=True)
+model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=False)
 
 # Print the model we just instantiated
 print(model_ft)
@@ -261,7 +261,7 @@ else:
             print("\t",name)
 
 # Observe that all parameters are being optimized
-optimizer_ft = optim.SGD(params_to_update, lr=0.2, momentum=0.9)
+optimizer_ft = optim.SGD(params_to_update, lr=0.025, momentum=0.9)
 
 
 
