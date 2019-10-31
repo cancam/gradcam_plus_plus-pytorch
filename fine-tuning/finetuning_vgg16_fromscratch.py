@@ -20,6 +20,8 @@ from mmcv.parallel import MMDataParallel
 # Top level data directory. Here we assume the format of the directory conforms 
 #   to the ImageFolder structure
 data_dir = "/home/cancam/imgworkspace/gradcam_plus_plus-pytorch/data/coco/fine-tune"
+save_path_best = '/home/cancam/imgworkspace/gradcam_plus_plus-pytorch/fine-tuning/models/vgg16bn_fromscratch_90_best.pth'
+save_path_last = '/truba/home/bcam/imgworkspace/gradcam_plus_plus-pytorch/fine-tuning/models/vgg16bn_fromscratch_90_last.pth'
 # Models to choose from [resnet, alexnet, vgg, squeezenet, densenet, inception]
 model_name = "vgg"
 
@@ -107,6 +109,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
+                torch.save(model.state_dict(), save_path_best)
             if phase == 'val':
                 val_acc_history.append(epoch_acc)
 
@@ -275,7 +278,7 @@ model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft
 ohist = []
 
 ohist = [h.cpu().numpy() for h in hist]
-
+torch.save(model_ft.state_dict(), save_path_last)
 #plt.title("Validation Accuracy vs. Number of Training Epochs")
 #plt.xlabel("Training Epochs")
 #plt.ylabel("Validation Accuracy")
@@ -284,7 +287,3 @@ ohist = [h.cpu().numpy() for h in hist]
 #plt.xticks(np.arange(1, num_epochs+1, 1.0))
 #plt.legend()
 #plt.show()
-
-# save the model
-path = '/truba/home/bcam/imgworkspace/gradcam_plus_plus-pytorch/fine-tuning/models/densenet_fromscratch_90.pth'
-torch.save(model_ft.state_dict(), path)
