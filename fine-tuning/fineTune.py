@@ -28,7 +28,7 @@ class fineTune():
 		self.input_size = input_size
 		self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 		
-		self.data_dir = os.path.join(work_dir, 'data/coco/fine_tune')
+		self.data_dir = os.path.join(work_dir, 'data/coco/fine-tune')
 		self.save_dir = os.path.join(work_dir, 'fine-tuning/models')
 
 		self.data_transforms = {

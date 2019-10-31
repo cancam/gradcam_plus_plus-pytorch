@@ -6,7 +6,7 @@ if __name__ == '__main__':
     num_classes = 80
     batch_size = 64
     num_epochs = 89
-    work_dir = '/home/cancam/workspace/gradcam_plus_plus-pytorch'
+    work_dir = '/truba/home/bcam/imgworkspace/gradcam_plus_plus-pytorch'
     tuner = fineTune(work_dir, models[2], num_classes, batch_size)
     tuner.init_model(tune_all_params = False, from_scratch = False)
     tuner.train_model()
