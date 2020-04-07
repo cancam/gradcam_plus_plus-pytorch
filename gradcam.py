@@ -111,11 +111,12 @@ class AblationCAM(object):
         ablation_scores = []
         for idx, activation in enumerate(activations[0]):
             # mask activations
-            activations_curr = activations_[0][idx]
+            activations_curr = activations[0][idx]
             mask = torch.zeros(activation.shape)
             activations_[0][idx] = mask
             # pass updated partial activations to subnet.
             remaining_response = self.subnet(activations_)
+            pdb.set_trace()
             if class_idx is None:
                 score_k = remaining_response[:, remaining_response.max(1)[-1]].squeeze()
             else:

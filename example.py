@@ -28,8 +28,8 @@ from PIL import ImageDraw
 img_dir = 'images'
 #img_name = 'collies.JPG'
 #img_name = 'multiple_dogs.jpg'
-#img_name = 'snake.JPEG'
-img_name = 'spoonbill.JPEG'
+img_name = 'snake.JPEG'
+#img_name = 'spoonbill.JPEG'
 img_path = os.path.join(img_dir, img_name)
 
 pil_img = PIL.Image.open(img_path)
@@ -88,7 +88,7 @@ vgg_model_dict = dict(type='vgg', arch=vgg, layer_name='features_29', input_size
 vgg_gradcam = GradCAM(vgg_model_dict, True)
 vgg_gradcampp = GradCAMpp(vgg_model_dict, True)
 vgg_ablationcam = AblationCAM(vgg_model_dict, True)
-cam_dict['vgg'] = [vgg_gradcam, vgg_gradcampp, vgg_ablationcam]
+cam_dict['vgg'] = [vgg_gradcam, vgg_ablationcam]
 
 #resnet_model_dict = dict(type='resnet', arch=resnet, layer_name='layer4', input_size=(224, 224))
 #resnet_gradcam = GradCAM(resnet_model_dict, True)
@@ -128,17 +128,17 @@ cam_dict['vgg'] = [vgg_gradcam, vgg_gradcampp, vgg_ablationcam]
 
 
 images = []
-for gradcam, gradcam_pp, ablationcam in cam_dict.values():
+for gradcam, ablationcam in cam_dict.values():
     mask, _ = gradcam(normed_torch_img)
     heatmap, result = visualize_cam(mask, torch_img)
 
-    mask_pp, _ = gradcam_pp(normed_torch_img)
-    heatmap_pp, result_pp = visualize_cam(mask_pp, torch_img)
+    #mask_pp, _ = gradcam_pp(normed_torch_img)
+    #heatmap_pp, result_pp = visualize_cam(mask_pp, torch_img)
     
     ablation, _ = ablationcam(normed_torch_img)
     heatmap_ablation, result_ablation = visualize_cam(ablation, torch_img)
     
-    images.append(torch.stack([torch_img.squeeze().cpu(), heatmap, heatmap_pp, heatmap_ablation, result, result_pp, result_ablation], 0))
+    images.append(torch.stack([torch_img.squeeze().cpu(), heatmap, heatmap_ablation, result, result_ablation], 0))
 images = make_grid(torch.cat(images, 0), nrow=9)
 
 
