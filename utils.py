@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import torch
+import pdb
 
 def visualize_cam(mask, img):
     """Make heatmap from mask and synthesize GradCAM result image using heatmap and img.
@@ -104,6 +105,30 @@ def find_densenet_layer(arch, target_layer_name):
         target_layer = target_layer._modules[hierarchy[3]]
 
     return target_layer
+
+def find_vgg_layer_pre(arch, target_layer_name):
+    """Find vgg layer to calculate GradCAM and GradCAM++
+    
+    Args:
+        arch: default torchvision densenet models
+        target_layer_name (str): the name of layer with its hierarchical information. please refer to usages below.
+            target_layer_name = 'features'
+            target_layer_name = 'features_42'
+            target_layer_name = 'classifier'
+            target_layer_name = 'classifier_0'
+            
+    Return:
+        target_layer: found layer. this layer will be hooked to get forward/backward pass information.
+    """
+    hierarchy = target_layer_name.split('_')
+
+    if len(hierarchy) >= 1:
+        target_layer = arch.features
+
+    if len(hierarchy) == 2:
+        target_layer = target_layer[int(hierarchy[1])]
+    return target_layer
+
 
 
 def find_vgg_layer(arch, target_layer_name):
