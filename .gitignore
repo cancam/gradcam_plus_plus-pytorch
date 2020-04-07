@@ -4,3 +4,6 @@ outputs/
 models/
 .pth
 *.swp
+*.pyc
+*.JPEG
+*.jpg
