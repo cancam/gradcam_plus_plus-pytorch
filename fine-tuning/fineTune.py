@@ -74,7 +74,7 @@ class fineTune():
 		input_size = 0
 		#pdb.set_trace()
 		if self.model_name=='resnet':
-			self.model = models.resnet18(pretrained=not from_scratch)
+			self.model = models.resnet50(pretrained=not from_scratch)
 			self.set_params(tune_all_params)
 			num_features = self.model.fc.in_features
 			self.model.fc = nn.Linear(num_features, self.num_classes)

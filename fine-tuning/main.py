@@ -6,7 +6,7 @@ if __name__ == '__main__':
     num_classes = 80
     batch_size = 64
     num_epochs = 89
-    work_dir = '/home/cancam/workspace/gradcam_plus_plus-pytorch'
-    tuner = fineTune(work_dir, models[2], num_classes, batch_size)
-    tuner.init_model(tune_all_params = False, from_scratch = False)
+    work_dir = '/home/cancam/workspace/saliency_methods/gradcam_plus_plus-pytorch'
+    tuner = fineTune(work_dir, models[0], num_classes, batch_size)
+    tuner.init_model(tune_all_params = False, from_scratch = True)
     tuner.train_model()
