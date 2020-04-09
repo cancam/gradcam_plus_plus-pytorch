@@ -150,7 +150,7 @@ class fineTune():
 				# compute epoch stats.
 				time_elapsed = time.time()-since
 				epoch_loss = running_loss / len(self.dataloaders[phase].dataset)
-				epoh_acc = running_corrects.double() / len(self.dataloaders[phase].dataset)
+				epoch_acc = running_corrects.double() / len(self.dataloaders[phase].dataset)
 				
 				print('{} Loss: {:.4f}, Acc: {:.4f}, Time: {:.4f}'\
 					  .format(phase, epoch_loss, epoch_acc, time_elapsed))
