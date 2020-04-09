@@ -96,7 +96,8 @@ class fineTune():
 			exit()
 
 		# send model to processing device.
-		self.model = MMDataParallel(self.model, device_ids=range(1)).cuda()
+		self.model = self.model.cuda()
+                #self.model = MMDataParallel(self.model, device_ids=range(1)).cuda()
 		self.get_params(tune_all_params)
 
 	def init_dataloaders(self, data_path):
@@ -157,10 +158,10 @@ class fineTune():
 
 				if phase == 'val' and epoch_acc > best_acc:
 					model_name = 'epoch_{}.pth'.format(epoch)
-					model_name = os.path.join(save_dir, model_name)
+					model_name = os.path.join(self.save_dir, model_name)
 					best_acc = epoch_acc
-					best_model = copy.deepcopy(self.model.stat_dict())
-					torch.save(self.model.state_dict(), model_path)
+					best_model = copy.deepcopy(self.model.state_dict())
+					torch.save(self.model.state_dict(), model_name)
 
 				if phase == 'val':
 					val_acc_history.append(epoch_acc)
