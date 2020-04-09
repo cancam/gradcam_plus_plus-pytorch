@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torchvision
 from torchvision import datasets, models, transforms
-
+from utils.newPad import NewPad
 import numpy as np
 import time
 import os
@@ -27,22 +27,23 @@ class fineTune():
 		self.batch_size = batch_size
 		self.input_size = input_size
 		self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-		
+		print(input_size)
 		self.data_dir = os.path.join(work_dir, 'data/coco/fine_tune')
-		self.save_dir = os.path.join(work_dir, 'fine-tuning/models')
-
+		self.save_dir = os.path.join(work_dir, 'fine-tuning/models/{}x{}/'.format(input_size[0], input_size[1]))
 		self.data_transforms = {
 			'train': transforms.Compose([
-			transforms.RandomResizedCrop(input_size),
-			transforms.RandomHorizontalFlip(),
-			transforms.ToTensor(),
-			transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-			]),
+			transforms.Resize(input_size),
+			transforms.RandomHorizontalFlip(p=0.5),
+                        #NewPad(divisor=32),
+                        transforms.ToTensor(),
+                        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+                        ]),
 			'val': transforms.Compose([
 			transforms.Resize(input_size),
-			transforms.CenterCrop(input_size),
-			transforms.ToTensor(),
-			transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+			transforms.RandomHorizontalFlip(p=0.5),
+                        #NewPad(divisor=32),
+                        transforms.ToTensor(),
+    			transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 			]),
 		}
 		self.init_dataloaders(os.path.join(work_dir, self.data_dir))
